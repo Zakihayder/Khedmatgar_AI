@@ -1,28 +1,63 @@
-# Khedmatgar AI (خدمتگار) 🚍🤖
+# Khedmatgar AI (خدمتگار)
 
-### "Apni Zaroorat Batao — Baaki Hum Karein" 
-*(Tell us your need — we'll handle the rest)*
+> **"Apni Zaroorat Batao — Baaki Hum Karein"**
+> *(Tell us your need — we'll handle the rest)*
 
-Khedmatgar AI is a production-grade agentic AI platform built for Pakistan's informal service economy. It automates the complete lifecycle of a service request—from understanding a multilingual user query to intelligently matching providers, dynamic pricing, booking simulation, real-time tracking, and post-service dispute resolution.
+**Khedmatgar AI** is a production-grade agentic AI platform built for Pakistan's informal service economy. It automates the complete lifecycle of a service request — from understanding a multilingual user query to intelligently matching providers, dynamic pricing, booking simulation, real-time tracking, and post-service dispute resolution.
 
-Built for the **AISeekho2026 Antigravity Hackathon** organized by InnoVista, Telenor Pakistan, Google for Developers, and the Ministry of IT & Telecom.
+Built for the **AISeekho2026 Antigravity Hackathon** organized by InnoVista, Telenor Pakistan, Google for Developers, and Ministry of IT & Telecom.
 
 ---
 
-## 🏗️ System Architecture
+## Table of Contents
 
+1. [Project Overview](#1-project-overview)
+2. [System Architecture](#2-system-architecture)
+3. [Page Structure](#3-page-structure)
+4. [Authentication — Supabase](#4-authentication--supabase)
+5. [Google Maps Integration](#5-google-maps-integration-real)
+6. [8 AI Agents — Detailed](#6-8-ai-agents--detailed)
+7. [Integrations Implemented](#7-integrations-implemented)
+8. [Mock vs Real Data](#8-mock-vs-real-data)
+9. [Setup Instructions](#9-setup-instructions)
+10. [Cost & Scalability](#10-cost--scalability)
+11. [Baseline Comparison](#11-baseline-comparison)
+12. [Privacy & Assumptions](#12-privacy--assumptions)
+13. [Limitations](#13-limitations)
+14. [Agentic Workflow Evidence](#14-agentic-workflow-evidence)
+
+---
+
+## 1. Project Overview
+
+The informal service economy in Pakistan — plumbers, electricians, AC technicians, tutors, beauticians — operates almost entirely through WhatsApp groups, phone calls, and word-of-mouth referrals. This results in missed opportunities, poor provider matching, unpredictable pricing, and zero automation.
+
+**Khedmatgar AI** replaces this chaos with an 8-agent autonomous system that:
+
+- Understands requests in **Urdu, Roman Urdu, English, and mixed/code-switched language**
+- Discovers and ranks providers using a **7-factor scoring algorithm**
+- Generates **dynamic, transparent price quotes** with full breakdown
+- Simulates complete **end-to-end booking with real notifications** (Gmail, Push, Slack)
+- Manages **follow-up reminders, live tracking, and dispute resolution**
+- Shows **full agent reasoning traces** — every decision is explainable and logged
+
+---
+
+## 2. System Architecture
+
+```
 ┌─────────────────────────────────────────────────────────┐
 │                    CLIENT LAYER                         │
 │         Next.js 14 App Router + TailwindCSS             │
 │    (Web Browser + Mobile Responsive PWA)                │
 └────────────────────┬────────────────────────────────────┘
-│
+                     │
 ┌────────────────────▼────────────────────────────────────┐
 │                 AUTH LAYER                              │
 │         Supabase Auth (Email + Google OAuth)            │
 │      Session Management + Protected Routes              │
 └────────────────────┬────────────────────────────────────┘
-│
+                     │
 ┌────────────────────▼────────────────────────────────────┐
 │           ANTIGRAVITY ORCHESTRATION ENGINE              │
 │                                                         │
@@ -31,254 +66,549 @@ Built for the **AISeekho2026 Antigravity Hackathon** organized by InnoVista, Tel
 │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐  │
 │  │ Samajh   │ │ Dhundho  │ │ Chunno   │ │  Daam    │  │
 │  │ Agent    │ │ Agent    │ │ Agent    │ │  Agent   │  │
-│  │ (NLU)    │ │(Discovery│ │(Ranking) │ │(Pricing) │  │
+│  │  (NLU)  │ │(Discovery│ │(Ranking) │ │(Pricing) │  │
 │  └──────────┘ └──────────┘ └──────────┘ └──────────┘  │
 │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐  │
-│  │  Waqt    │ │Book Karo │ │Yaad Dila │ │Masla Hal │  │
-│  │  Agent   │ │  Agent   │ │  Agent   │ │  Agent   │  │
-│  │(Schedule)│ │(Booking) │ │(Follow-up│ │(Dispute) │  │
+│  │  Waqt   │ │Book Karo │ │Yaad Dila │ │Masla Hal │  │
+│  │  Agent  │ │  Agent   │ │  Agent   │ │  Agent   │  │
+│  │(Schedule│ │(Booking) │ │(Follow-up│ │(Dispute) │  │
 │  └──────────┘ └──────────┘ └──────────┘ └──────────┘  │
 └────────────────────┬────────────────────────────────────┘
-│
+                     │
 ┌────────────────────▼────────────────────────────────────┐
 │                 DATA & SERVICES LAYER                   │
 │                                                         │
 │  Supabase DB │ Google Maps │ Gemini AI │ Places API     │
 │  Gmail API   │ Slack Webhook │ Web Push │ Supabase Storage│
 └─────────────────────────────────────────────────────────┘
+```
 
+### Tech Stack
 
----
-
-## 🗂️ Page Structure
-
-| Page Route | Description |
-| :--- | :--- |
-| `Landing/` | Hero section, platform stats, features, and live booking feed. |
-| `Sign Up/auth/signup` | Email + Google OAuth user registration. |
-| `Login/auth/login` | Supabase session authentication interface. |
-| `Service Request/request` | Multilingual conversational chat UI + live agent trace panel. |
-| `Map & Results/results` | Fully integrated Google Map view + ranked provider info cards. |
-| `Booking Flow/book/[providerId]` | Slot management selector, pricing breakdowns, and checkout confirmation. |
-| `Live Tracking/track/[bookingId]` | Real-time animated provider movement updates tracked on maps. |
-| `Feedback/feedback/[bookingId]` | Interactive rating entry & automated dispute trigger mechanism. |
-| `Dashboard/dashboard` | Administrative performance overview metrics, active feeds. |
-| `Agent Trace/trace` | Comprehensive multi-agent workplan Directed Acyclic Graph (DAG) for evaluation. |
-| `Stress Test/demo` | Sandbox module executing 6 custom operational edge cases. |
-| `Profile/profile` | End-user transaction history log, preferences portal. |
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 14 (App Router) + TypeScript |
+| Styling | TailwindCSS v3 + Custom Glassmorphism CSS |
+| Animations | Framer Motion + GSAP ScrollTrigger |
+| 3D Elements | Three.js (hero section) |
+| Maps | Google Maps JavaScript API |
+| AI / NLU | Google Gemini 1.5 Flash |
+| Database + Auth | Supabase (PostgreSQL + Auth + Realtime) |
+| Notifications | Web Push API + Gmail API + Slack Webhook |
+| Voice Input | Web Speech API (browser native) |
+| Deployment | Vercel |
 
 ---
 
-## 🔐 Authentication — Supabase
+## 3. Page Structure
 
-* **Provider Backend:** Powered securely via Supabase Auth infrastructure.
-* **Authentication Vectors:** Supports standard **Email + Password** (with validation hooks) and one-click **Google OAuth 2.0** verification schemes.
-* **Architecture Implementation:**
-  * Client initialization parameters encapsulated securely inside `lib/supabase/client.ts`.
-  * Server-side rendering session handling built over the `@supabase/ssr` module stack.
-  * Router rules enforced via `middleware.ts` protecting all internal sub-paths except static pages and `/auth/*`.
-  * Automated user profile creation mapped dynamically to the `profiles` relational scheme using automated database triggers during initialization.
-  * Secure cross-tab real-time session tracking synchronized natively over Supabase Realtime layers.
-
-### Managed Relational Data Schema
-* `profiles`: Houses secure customer meta-data, usage tier flags, and reward metrics.
-* `bookings`: State engine ledger maintaining life-cycle steps of all transaction records.
-* `providers`: Spatial indices containing both structural static mocks and live commercial data feeds.
-* `disputes`: Relational store holding ticket resolutions and validation rules.
-* `notifications`: Distributed transactional dispatch history ledger mapped per unique user ID.
-* `feedback`: Normalized storage for raw client review metrics and structured textual sentiments.
+| Page | Route | Description |
+|---|---|---|
+| Landing | `/` | Hero with 3D animations, live stats, feature showcase |
+| Sign Up | `/auth/signup` | Email + Google OAuth registration |
+| Login | `/auth/login` | Supabase authentication |
+| Service Request | `/request` | Chat interface + live agent reasoning panel |
+| Map & Results | `/results` | Real Google Map + ranked provider cards |
+| Booking Flow | `/book/[providerId]` | Slot picker, pricing breakdown, confirmation |
+| Live Tracking | `/track/[bookingId]` | Animated provider movement on real map |
+| Feedback | `/feedback/[bookingId]` | Star rating + dispute trigger |
+| Dashboard | `/dashboard` | Admin view, live stats, real-time booking feed |
+| Agent Trace | `/trace` | Full workplan DAG viewer for judges |
+| Stress Test | `/demo` | 6 edge case scenarios with baseline comparison |
+| Profile | `/profile` | User booking history, preferences, loyalty points |
 
 ---
 
-## 🗺️ Google Maps Integration (Real)
+## 4. Authentication — Supabase
 
-Engineered directly on top of the native `@googlemaps/js-api-loader` package layer.
+**Provider:** Supabase Auth
 
-### Enabled Production Endpoints
-* **Maps JavaScript API:** Renders cross-platform fluid canvas layers themed explicitly to match the dark application aesthetic.
-* **Places API:** Orchestrates geographic autocomplete functions and contextual multi-category lookups.
-* **Distance Matrix API:** Calculates live absolute routing constraints and transit durations between nodes.
-* **Directions API:** Plots linear tracking coordinates mapping active route legs dynamically.
-* **Geocoding API:** Resolves address string inputs into spatial latitude and longitude elements.
+**Methods supported:**
+- Email + Password (with email verification flow)
+- Google OAuth 2.0 (one-click sign-in)
 
-### Specialized UI Implementations
-* Geolocation API context loops tracking user boundaries dynamically.
-* Animated vector category map flags mapping custom domain properties per item type.
-* Clickable tracking flags triggering comprehensive overview details including names, cost targets, and distance metrics.
-* Bounded coverage overlays rendering customizable contextual perimeter highlights (1km / 3km / 5km increments).
-* Interactive pick-up tracking allowing users to modify absolute address parameters directly on-map via draggable pin elements.
+**Implementation details:**
+- Supabase client initialized in `lib/supabase/client.ts`
+- Server-side session management via `@supabase/ssr` package
+- `middleware.ts` protects all routes except `/` and `/auth/*`
+- On signup: user profile auto-created in `profiles` table via Supabase database trigger
+- Session persisted in HTTP-only cookies (not localStorage) for SSR compatibility
+- Auth state synced across browser tabs via Supabase Realtime channels
 
-### Real Business Analytics via Places API
-When an operational profile references retail or healthcare classifications (e.g., medical suppliers, local merchants), the engine passes current coordinate boundaries and target category keys to the search engine. This translates raw structural components seamlessly alongside existing metadata for consolidated evaluation via the ranking system.
+**Database tables:**
+
+```sql
+profiles        -- user info, preferences, loyalty points
+bookings        -- all booking records with full state
+providers       -- service provider data (25 mock providers)
+disputes        -- dispute records and resolution outcomes
+notifications   -- notification log per user per booking
+feedback        -- star ratings and written reviews
+```
 
 ---
 
-## 🤖 8 AI Agents — Detailed
+## 5. Google Maps Integration (Real)
+
+**Package:** `@googlemaps/js-api-loader`
+
+### APIs Enabled
+
+| API | Usage |
+|---|---|
+| Maps JavaScript API | Full interactive dark-themed map rendering |
+| Places API | Real business search + address autocomplete |
+| Distance Matrix API | Travel time calculation between user and providers |
+| Directions API | Animated route polyline from user to selected provider |
+| Geocoding API | Convert address text to lat/lng coordinates |
+
+### Map Features Implemented
+
+- Custom dark map style matching app theme (deep navy background)
+- User GPS location detection via browser Geolocation API
+- Google Places Autocomplete on all location input fields
+- Custom animated SVG provider pins per service category (AC unit, wrench, bolt, scissors)
+- Clickable provider pins with info bubble: name, rating, distance, price, availability badge
+- Animated polyline route drawn from user location to selected provider
+- Service radius circle overlay with 1 km / 3 km / 5 km toggle
+- Demand heatmap layer showing request density by area
+- Provider cluster groups for high-density zones
+- Draggable user location marker for precise service address input
+- Street View button on provider info bubbles
+
+### Real Business Search via Google Places
+
+When a user searches for restaurants, pharmacies, salons, or any formal business:
+
+1. System calls `Places Nearby Search` with: `{ location, radius: 3000, keyword, opennow }`
+2. Fetches live data: business name, Google rating, photos, opening hours
+3. Normalizes response to match mock provider card format
+4. Applies our multi-factor scoring on top of real Google data
+5. Shows **Best Choice**, **Fastest**, **Top Rated** badges based on composite score
+
+For informal services (plumber, AC technician, electrician, tutor): uses mock provider database.
+
+---
+
+## 6. 8 AI Agents — Detailed
 
 ### Agent 1 — Samajh Agent (Intent Parser)
-* **Role:** High-performance multilingual Natural Language Understanding (NLU) & slot extraction engine.
-* **Model Pipeline:** Powered directly via Google Gemini 1.5 Flash.
-* **Input Context:** Handles arbitrary textual string queries across Urdu (Arabic script), Roman Urdu, English, and code-switched phrases.
-* **Extracted Entities:** Resolves fields including `service_type`, spatial `location`, target `time`, `urgency` tier (1–5 ranking scales), `budget_sensitivity`, and custom constraint vectors.
-* **Safety Protocols:** Assigns explicit confidence quotients (0.0 to 1.0 scales). Values falling below a 0.75 floor immediately route to conversational diagnostic validation layers. It rolls back to a high-speed string heuristic framework if upstream server components throw timeout exceptions.
-* **Output Format:** Emits clean, validated JSON schemas containing parsed parameters.
+
+| Property | Detail |
+|---|---|
+| Role | Multilingual NLU and entity extraction |
+| Model | Google Gemini 1.5 Flash |
+| Input | Raw user text (any language or script) |
+| Output | Structured JSON intent object |
+
+**Extracts:** `service_type`, `location`, `time_preference`, `urgency (1–5)`, `budget_sensitivity`, `special_requirements`
+
+**Languages:** Urdu (Arabic script), Roman Urdu, English, code-switched mixed input
+
+**Confidence scoring:** 0.0–1.0. Below 0.75 → returns a clarification question in the detected language.
+
+**Fallback:** Rule-based keyword matching when Gemini API is unavailable.
+
+**Example term mappings:**
+
+| User says | Mapped to |
+|---|---|
+| "bijli" / "light nahi" | `ELECTRICIAN` |
+| "paani" / "nala band" | `PLUMBER` |
+| "thanda" / "AC" | `AC_REPAIR` |
+| "parhai" / "teacher" | `TUTOR` |
+
+---
 
 ### Agent 2 — Dhundho Agent (Provider Discovery)
-* **Role:** Resolves geographic candidate arrays matching structural target properties.
-* **Data Sources:** Merges static database nodes with programmatic responses from the live Places API.
-* **Execution Logic:** References upstream context parsing flags to determine optimal database targets.
-* **Filtering Logic:** Screens elements based on availability parameters, target radius parameters, and active configuration statuses.
-* **Output Format:** Generates an unstructured candidate array bounding up to 10 distinct entities.
+
+| Property | Detail |
+|---|---|
+| Role | Find and filter relevant providers by service and location |
+| Data Sources | Mock JSON database (informal services) + Google Places API (businesses) |
+| Filter Criteria | Active status, service category match, area proximity |
+| Output | Raw candidate list (up to 10 providers) |
+
+Automatically selects data source based on `service_type` classification from Agent 1.
+
+---
 
 ### Agent 3 — Chunno Agent (Matching & Ranking)
-* **Role:** Multi-criteria optimization and text reasoning generation.
-* **Scoring Matrix:** Computes ranking variables according to the following mathematical model:
 
-$$\text{Match Score} = (\text{Distance} \times 0.20) + (\text{Rating} \times 0.20) + (\text{Availability} \times 0.15) + (\text{Reliability} \times 0.15) + (\text{Specialization} \times 0.15) + (\text{Price Fit} \times 0.10) + (\text{Recency} \times 0.05)$$
+| Property | Detail |
+|---|---|
+| Role | Multi-factor intelligent provider scoring and ranking |
+| Anomaly Detection | Penalizes providers where rating > 4.5 AND cancellation_rate > 35% |
+| Reasoning | Gemini generates plain-language explanation for top 3 picks |
+| Output | Ranked provider list with individual scores and reasoning text |
 
-* **Fault Protection:** Penalizes provider entries presenting an active delivery failure rate above a 35% performance ceiling.
-* **Output Format:** Delivers sorted candidate collections backed by structured, plain-language reasoning descriptions generated natively via Gemini.
+**Scoring Formula:**
+
+```
+MATCH_SCORE =
+  distance_score     × 0.20    (normalized: closer = higher)
+  rating_score       × 0.20    (star rating / 5.0)
+  availability_score × 0.15    (slot match quality 0–1)
+  reliability_score  × 0.15    (on_time_score / 100)
+  specialization     × 0.15    (job complexity match depth)
+  price_fit_score    × 0.10    (budget alignment)
+  recency_score      × 0.05    (reviews in last 30 days / total)
+```
+
+---
 
 ### Agent 4 — Daam Agent (Dynamic Pricing)
-* **Role:** Provides auditable, fair price optimization across fluid operational bounds.
-* **Pricing Formula:** Compiles absolute baseline price matrices using a standard multi-variable calculation:
 
-$$\text{Total Fee} = \left[(\text{Hourly Rate} \times \text{Hours}) + (\text{Distance}_{\text{km}} \times 50) + \text{Urgency Penalty}\right] \times \text{Demand Multiplier} - \text{Loyalty Deduction}$$
+| Property | Detail |
+|---|---|
+| Role | Transparent, fair price estimation with itemized breakdown |
+| Budget Sensitivity | Suggests cheaper alternative if total exceeds user budget signal |
+| Output | Itemized price card with min/max range + budget-friendly option |
 
-* *Urgency Parameters:* Increments calculated at +10% for concurrent day requests, +20% for targets within 6 hours, and +35% for critical constraints under 2 hours.
-* *Demand Parameters:* Assesses a 1.3x scaling factor during identified rush periods, and a 0.9x modifier during off-peak windows.
-* **Safety Protocol:** Identifies budget threshold breaches dynamically and references alternative configurations to lower friction points.
-* **Output Format:** Exposes a granular itemized cost receipt payload showing minimum and maximum price ranges.
+**Pricing Formula:**
+
+```
+BASE_PRICE   = provider.hourly_rate × estimated_hours
+DISTANCE_FEE = distance_km × PKR 50
+URGENCY      = +10% same day | +20% <6hrs | +35% <2hrs | +0% tomorrow+
+DEMAND       = ×1.3 peak hours (8–10am, 5–8pm) | ×1.0 normal | ×0.9 off-peak
+LOYALTY      = −10% returning users
+
+TOTAL = (BASE + DISTANCE + URGENCY) × DEMAND − LOYALTY
+```
+
+---
 
 ### Agent 5 — Waqt Agent (Scheduling)
-* **Role:** Conflict resolution and time allocation engine.
-* **Functional Scope:** Enforces a rigid 45-minute spatial transportation buffer block between bookings, actively blocks duplicate requests, and handles fallback waitlist states.
-* **Error Mitigation:** Yields 3 sorted alternative scheduling windows if the initial choice is unavailable.
-* **Output Format:** Emits verified reservation targets alongside structured calendar payload configurations.
+
+| Property | Detail |
+|---|---|
+| Role | Intelligent slot management and conflict resolution |
+| Travel Buffer | Minimum 45-minute gap enforced between consecutive provider jobs |
+| Conflict Handling | Suggests next 3 available slots if requested time is already taken |
+| Auto-Reschedule | Finds replacement provider or next open slot if original cancels |
+| Output | Confirmed slot + 3 alternatives + `.ics` calendar event data |
+
+---
 
 ### Agent 6 — Book Karo Agent (Booking Execution)
-* **Role:** Manages the transaction state engine and registers live bookings.
-* **Pipeline Sequence:**
-  1. Compiles standard identifier hashes structured as: `KHD-YYYYMMDD-XXXX`.
-  2. Persists verified parameters directly down to the Supabase database layers.
-  3. Updates operational availability flags inside active relational tables.
-  4. Dispatches HTML summary notifications via the Google Workspace endpoints.
-  5. Triggers contextual real-time device notifications.
-  6. Passes transactional JSON summaries through secure Slack incoming integration lines.
-  7. Builds standard `.ics` tracking blocks for user records.
-* **Output Format:** Emits structural transaction records alongside all associated tracking metadata.
+
+| Property | Detail |
+|---|---|
+| Role | Simulate complete booking transaction with all side effects |
+| Booking ID Format | `KHD-YYYYMMDD-XXXX` |
+| Output | Complete booking object + all confirmation artifacts |
+
+**Actions performed (all logged with timestamps in agent trace):**
+
+1. Generates unique Booking ID
+2. Writes record to Supabase `bookings` table
+3. Updates provider availability in database
+4. Sends Gmail HTML confirmation email (if user opted in)
+5. Fires browser push notification via Web Push API
+6. Posts Slack webhook alert to provider channel
+7. Generates `.ics` Google Calendar event string
+8. Logs complete action trace for `/trace` viewer
+
+---
 
 ### Agent 7 — Yaad Dilao Agent (Follow-up Automation)
-* **Role:** Tracks execution progress and manages life-cycle alerts.
-* **Trigger Milestones:** Maps notifications across specific operational timelines, including:
-  * `T-60min`: Dispatches a push notification reminder to the client.
-  * `T-15min`: Updates dispatch parameters to an active transit state.
-  * `T+0`: Marks execution timelines as officially started.
-  * `T+duration`: Prompts the interface to present a completion form.
-  * `T+1hr`: Initiates an automated feedback collection prompt.
-* **Presentation Mode:** Leverages a unified scheduling engine to safely simulate the execution cycle during live demonstrations.
+
+| Property | Detail |
+|---|---|
+| Role | Post-booking lifecycle and notification scheduling |
+| Output | Notification timeline object with all scheduled triggers |
+
+**Trigger schedule:**
+
+| Trigger | Type | Message |
+|---|---|---|
+| T−60min | Push notification | "Technician 1 ghante mein pohonchega" |
+| T−15min | Status update | "Provider en route — 15 minutes away" |
+| T+0 | Confirmation | "Service has started" |
+| T+duration | Completion prompt | "Service complete — please confirm" |
+| T+1hr | Feedback request | "Rate your experience" |
+| T+24hr | Email reminder | Receipt + rating nudge |
+
+> *Demo mode: `setTimeout` chain simulates all triggers live during presentation.*
+
+---
 
 ### Agent 8 — Masla Hal Karo Agent (Dispute Resolution)
-* **Role:** Resolves post-transaction tickets and tracks platform safety parameters.
-* **Classifications:** Maps issues across identified problem models like provider absence, service discrepancies, excess charging, and partial execution.
-* **Resolution Rules Engine:**
-  * Provider Absence $\rightarrow$ Triggers full refund processes and increments internal warning metrics.
-  * Price Discrepancies $> 30\% \rightarrow$ Issues partial structural balance returns and triggers an investigation flag.
-* **Escalation Protocol:** Gemini reviews text context metrics; cases presenting financial risk thresholds above PKR 5,000 route directly to high-priority verification queues.
-* **Output Format:** Generates resolution confirmation schemas alongside updated provider evaluation updates.
+
+| Property | Detail |
+|---|---|
+| Role | Post-service issue classification and automated resolution |
+| Classification | Google Gemini classifies dispute type and severity |
+| Escalation Threshold | PKR > 5,000 OR repeated complaints → Gmail escalation to admin |
+| Provider Impact | Updates `risk_score`; 3 verified strikes → `is_blacklisted = true` |
+| Output | Resolution decision + reasoning + provider reputation update |
+
+**Auto-resolution rules:**
+
+| Dispute Type | Resolution |
+|---|---|
+| `no_show` | Full refund simulated + provider strike added |
+| `overcharging > 30%` | Partial refund + investigation flag set |
+| `quality_issue` | Discount code on next booking |
+| `incomplete_work` | Provider must-return simulation triggered |
 
 ---
 
-## 🔗 Integrations Implemented
+## 7. Integrations Implemented
 
-* **Supabase Core Layers:** Handles account states, transaction management records, real-time sync states, and dynamic statistics panels across active dashboard components.
-* **Google Gemini AI Engine:** Utilizing `gemini-1.5-flash` to execute language parsing tasks, generate ranking descriptions, evaluate semantic sentiment scores, and classify dispute text logs. Outputs flow via Server-Sent Events (SSE) stream components to the tracing dashboard interface.
-* **Google Maps API Environment:** Generates spatial canvas displays, plots routing indicators, processes address auto-fills, and executes geo-distance math.
-* **Gmail API Wrapper:** Dispatches transactional summaries, life-cycle tracking reminders, and escalation tickets inside responsive HTML message templates.
-* **Slack Webhooks:** Translates new transactions immediately into dedicated channel updates, including context cards and interactive acceptance components.
-* **Web Push Notifications:** Implements service worker architectures (`public/sw.js`) to process transactional tracking status cards even when the application is minimized.
-* **Web Speech API Component:** Connects to native client parsing engines to accept speech inputs in Urdu (`ur-PK`) and English (`en-US`), handling quiet phases to submit texts automatically.
+### Supabase — Database, Auth & Realtime
+
+| Key | Value |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anon/public key |
+
+- User authentication (Email + Google OAuth)
+- Booking persistence across sessions
+- Provider and dispute record storage
+- **Realtime:** Dashboard subscribes to `bookings` table INSERT events — new bookings animate into the feed live
+
+### Google Gemini AI
+
+| Key | Value |
+|---|---|
+| `GOOGLE_GEMINI_API_KEY` | From Google AI Studio |
+
+- **Model:** `gemini-1.5-flash`
+- Intent extraction (Samajh Agent)
+- Ranking reasoning text generation (Chunno Agent)
+- Review sentiment scoring
+- Dispute type classification (Masla Hal Karo Agent)
+- **Streaming:** Token-by-token responses streamed via Server-Sent Events to frontend trace panel
+
+### Google Maps Platform
+
+| Key | Value |
+|---|---|
+| `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | From Google Cloud Console |
+
+- APIs enabled: Maps JavaScript, Places, Distance Matrix, Directions, Geocoding
+- Interactive dark-themed map with animated provider pins
+- Real business search via Places Nearby Search
+- Animated route polyline drawing
+- Address autocomplete on all location fields
+
+### Gmail API
+
+| Key | Value |
+|---|---|
+| `GMAIL_CLIENT_ID` | From Google Cloud Console OAuth |
+| `GMAIL_CLIENT_SECRET` | From Google Cloud Console OAuth |
+| `GMAIL_REFRESH_TOKEN` | From OAuth Playground |
+
+- Booking confirmation emails (branded HTML template)
+- T−1hr reminder emails
+- Dispute escalation emails to admin
+- **Fallback:** Beautiful email preview card shown in UI when OAuth not configured
+
+### Slack Webhook
+
+| Key | Value |
+|---|---|
+| `SLACK_WEBHOOK_URL` | From api.slack.com/apps |
+
+- Provider job alert on every new booking
+- Message includes: service type, customer area, time, estimated earnings, Accept/Decline buttons
+- **Fallback:** "Slack notification simulated" logged in agent trace with preview card
+
+### Web Push Notifications
+
+| Key | Value |
+|---|---|
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Generated via `npx web-push generate-vapid-keys` |
+| `VAPID_PRIVATE_KEY` | Generated via `npx web-push generate-vapid-keys` |
+
+- `public/sw.js` service worker handles background push when tab is closed
+- Booking confirmation, reminders, en-route alerts, completion prompts
+- **Fallback:** In-app toast notifications if browser permission denied
+
+### Web Speech API (Voice Input)
+
+- No API key required — browser-native API
+- Languages: `ur-PK` (Urdu), `en-US` (English)
+- Real-time transcript display as user speaks
+- Auto-submit triggered on silence detection
+- Requires Chrome or Chromium-based browser
 
 ---
 
-## 📊 Mock vs Real Data Matrix
+## 8. Mock vs Real Data
 
-| Target Feature | Applied Engine Type | Practical Notes |
-| :--- | :--- | :--- |
-| **Traditional Providers** | Synthetic Dataset Matrix | 25 production profiles built around realistic regional data metrics. |
-| **Commercial Entities** | Live Integration Service | Populates details directly using Nearby Search features from Google. |
-| **User Assessment Metrics** | Live Integration Service | Reads active review data from Google Places response tables. |
-| **Semantic Text Analysis** | Live Integration Service | Evaluates customer sentiment parameters across imported Google reviews using Gemini. |
-| **Routing Math Calculations** | Hybrid Execution Engine | Uses Google's Distance Matrix API, falling back to Haversine algorithms if throttled. |
-| **System Transaction Stores** | Production Database | Writes parameters down to structured tables, persisting values across user sessions. |
+| Data Type | Source | Notes |
+|---|---|---|
+| Informal providers (plumber, AC, etc.) | Mock JSON — 25 providers | Realistic Pakistani names, Islamabad sectors G-13 to F-8, synthetic coordinates |
+| Business search (restaurants, pharmacies) | **Real Google Places API** | Live data fetched at request time |
+| Provider ratings for businesses | **Real Google Reviews** | Via Places API `rating` + `user_ratings_total` fields |
+| Review sentiment analysis | **Real Gemini API** | Runs on fetched review text in real time |
+| Distance calculations | **Real Distance Matrix API** | Falls back to Haversine formula on quota/API failure |
+| Booking records | **Real Supabase database** | Persisted across sessions, survives browser refresh |
+| User accounts | **Real Supabase Auth** | Email verification + Google OAuth |
+| Push notifications | **Real Web Push API** | Requires VAPID keys + browser permission grant |
+| Email notifications | **Real Gmail API** | Falls back gracefully to simulation preview |
+| Slack alerts | **Real Slack Webhook** | Falls back gracefully to simulated trace log |
 
 ---
 
-## ⚙️ Setup Instructions
+## 9. Setup Instructions
 
-Follow these steps to deploy and execute Khedmatgar AI locally:
+### Prerequisites
 
-### 1. Repository Setup & Dependencies
+- Node.js 18+
+- npm or yarn
+- Google Cloud Console project with APIs enabled
+- Supabase project (free tier sufficient)
+- Vercel account (for deployment)
+
+### Steps
+
 ```bash
-git clone [https://github.com/yourteam/khedmatgar-ai](https://github.com/yourteam/khedmatgar-ai)
+# 1. Clone the repository
+git clone https://github.com/yourteam/khedmatgar-ai
 cd khedmatgar-ai
+
+# 2. Install all dependencies
 npm install
-2. Environment Variables Configuration
-Create a .env.local file in the root directory and populate the required keys:
 
-Bash
+# 3. Set up environment variables
 cp .env.example .env.local
-Ensure the following fields are defined:
+# Open .env.local and fill in all API keys (see table below)
 
-NEXT_PUBLIC_SUPABASE_URL & NEXT_PUBLIC_SUPABASE_ANON_KEY
+# 4. Set up Supabase database
+# Go to: your Supabase project → SQL Editor
+# Run the full contents of: supabase/schema.sql
 
-GOOGLE_GEMINI_API_KEY
-
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
-
-GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, & GMAIL_REFRESH_TOKEN
-
-SLACK_WEBHOOK_URL
-
-NEXT_PUBLIC_VAPID_PUBLIC_KEY & VAPID_PRIVATE_KEY
-
-3. Database Initialization
-Execute the setup scripts located inside supabase/schema.sql directly inside your Supabase SQL Editor panel to initialize the relational framework.
-
-4. VAPID Keys Generation
-Bash
+# 5. Generate VAPID keys for push notifications
 npx web-push generate-vapid-keys
-5. Launch the Development Environment
-Bash
+# Copy the output Public Key and Private Key into .env.local
+
+# 6. Start development server
 npm run dev
-Open http://localhost:3000 inside your browser to interact with the platform.
+# Open http://localhost:3000
 
-💰 Cost & Scalability Analysis
-Estimated Cost Metrics Per Single Complete Lifecycle Sequence
-Gemini LLM Overhead (NLU + Contextual Reasoning Logic): ~$0.002
+# 7. Deploy to production
+vercel --prod
+```
 
-Google Maps Distance Matrix Routing Computations: ~$0.001
+### Environment Variables Reference
 
-Google Places Nearby Search Commercial Lookup Calls: ~$0.002
+```dotenv
+# ── Google ─────────────────────────────────────────────
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=      # console.cloud.google.com
+GOOGLE_GEMINI_API_KEY=                # aistudio.google.com
 
-Supabase Transactions & Push Notification Targets: ~$0.000 (Covered under Free Tier limits)
+# ── Supabase ───────────────────────────────────────────
+NEXT_PUBLIC_SUPABASE_URL=             # supabase.com → Settings → API
+NEXT_PUBLIC_SUPABASE_ANON_KEY=        # supabase.com → Settings → API
 
-Total Estimated Compute Cost Per Service Sequence: ~$0.005
+# ── Gmail OAuth (optional) ─────────────────────────────
+GMAIL_CLIENT_ID=                      # Google Cloud Console → OAuth
+GMAIL_CLIENT_SECRET=                  # Google Cloud Console → OAuth
+GMAIL_REFRESH_TOKEN=                  # developers.google.com/oauthplayground
 
-Defined Scaling Architecture Lifecycle
-10x Operational Multipliers (1,000 active users/day): Current serverless architecture effortlessly scales within standard baseline allowances.
+# ── Slack (optional) ───────────────────────────────────
+SLACK_WEBHOOK_URL=                    # api.slack.com/apps → Incoming Webhooks
 
-100x Operational Multipliers (10,000 active users/day): Introduce a high-speed Redis caching architecture to capture identical discovery calls, shift data models to premium database tiers, and deploy isolation limits across micro-routing structures.
+# ── Web Push Notifications ─────────────────────────────
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=         # npx web-push generate-vapid-keys
+VAPID_PRIVATE_KEY=                    # npx web-push generate-vapid-keys
 
-1,000x Operational Multipliers (100,000+ active users/day): Decouple individual agent processes into fully containerized services, map transactions across a distributed queue architecture (e.g., BullMQ), and apply localized edge endpoints.
+# ── App ────────────────────────────────────────────────
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
 
-🔒 Privacy & Operational Assumptions
-All localized provider entities are entirely synthetic; any similarities to actual companies or individuals are purely coincidental.
+> **Note:** The app runs with only `GOOGLE_MAPS_API_KEY`, `GOOGLE_GEMINI_API_KEY`, and `SUPABASE_*` keys. Gmail and Slack fall back to simulation automatically if not configured.
 
-Client email elements are protected natively inside Supabase Auth systems using modern encryption structures.
+---
 
-Geographic location parameters are requested strictly when the user grants permission inside the client browser.
+## 10. Cost & Scalability
 
-Voice translation actions are calculated over the browser's native Web Speech API endpoints and are not written to persistent servers.
+### Estimated Cost Per Booking Operation
 
-This platform is an architectural simulation tool built for optimization analysis; no real financial clearings or legal service fulfillments occur.
+| Operation | Estimated Cost |
+|---|---|
+| Gemini API — NLU + reasoning generation | ~$0.002 |
+| Google Maps Distance Matrix call | ~$0.001 |
+| Google Places Nearby Search call | ~$0.002 |
+| Supabase DB write (free tier) | ~$0.000 |
+| Web Push notification | ~$0.000 |
+| **Total per booking end-to-end** | **~$0.005** |
+
+### Scaling Path
+
+| Scale | Users/Day | Approach |
+|---|---|---|
+| **Current** | ~200 | Vercel serverless + Supabase free tier |
+| **10x** | ~1,000 | Same architecture, well within free tier limits |
+| **100x** | ~10,000 | Redis caching for provider queries, Supabase Pro, Vercel Pro edge functions |
+| **1,000x** | ~100,000 | Microservices per agent, BullMQ distributed task queue, CDN for map tiles, Supabase read replicas |
+
+### Latency Targets
+
+| Step | Target |
+|---|---|
+| Intent extraction (Gemini) | < 1.5 seconds |
+| Provider ranking (7-factor, in-memory) | < 200 ms |
+| Full booking pipeline (all 8 agents) | < 5 seconds end-to-end |
+
+---
+
+## 11. Baseline Comparison
+
+| Metric | Without Khedmatgar AI | With Khedmatgar AI |
+|---|---|---|
+| Time to book | 30–45 minutes | < 10 seconds |
+| User steps required | 7+ manual actions | 1 input (text or voice) |
+| Language support | WhatsApp text only | Urdu + Roman Urdu + English + Voice |
+| Provider selection logic | Whoever replies first | 7-factor AI-scored ranking |
+| Price transparency | Unknown until provider calls back | Itemized estimate before booking |
+| Booking confirmation | Verbal only | Email + Push + Slack + PDF receipt |
+| Follow-up reminders | None | Fully automated at T−60min, T−15min, T+completion |
+| Live tracking | None | Animated provider movement on Google Maps |
+| Dispute resolution | No formal process | Automated classification + email escalation |
+
+---
+
+## 12. Privacy & Assumptions
+
+- No real personal data used — all provider data is fully synthetic
+- User emails stored only in Supabase Auth with encryption at rest
+- Google Maps accesses device location only after explicit user permission grant
+- Voice input processed locally by browser Web Speech API — audio never sent to our servers
+- All bookings are simulations — no real financial transactions occur
+- Slack webhook posts to a demo workspace controlled by the team
+- Mock provider phone numbers follow Pakistani format (`+92-3XX-XXXXXXX`) but are not real active numbers
+- Provider photos use generated placeholder avatars only — no real individuals depicted
+
+---
+
+## 13. Limitations
+
+- Gmail OAuth flow is complex to configure — demo gracefully falls back to email preview simulation card in UI
+- Web Speech API voice input requires Chrome or a Chromium-based browser to function
+- Google Places API has daily quota limits — mock provider data used as an automatic fallback when the quota is exceeded
+- Real-time provider GPS tracking is simulated — no actual GPS device data from providers
+- Push notifications require HTTPS in production (automatic on Vercel, not available on plain `http://localhost`)
+- Urdu voice recognition accuracy depends on browser implementation and microphone quality
+- Scheduling conflict resolution uses in-memory state — would require a distributed lock (e.g., Redis) for safe concurrent user handling in production
+- Supabase free tier has 500 MB database limit and 2 GB bandwidth/month — sufficient for hackathon demo scale
+
+---
+
+## 14. Agentic Workflow Evidence
+
+The system demonstrates all six required agentic behaviors:
+
+| Behavior | How It Is Demonstrated |
+|---|---|
+| **Observes** | Reads raw user input, detects language and script, reads provider database, checks real-time slot availability |
+| **Reasons** | Gemini generates explicit written reasoning for provider selection; confidence score calculated for every NLU output |
+| **Decides** | Chunno Agent selects best provider with explainable weighted scoring; Masla Hal Karo auto-classifies and resolves disputes |
+| **Acts** | Books slot in Supabase, sends Gmail email, fires push notification, posts Slack alert, updates provider calendar |
+| **Evaluates** | Anomaly detection on provider data (high rating + high cancellation); confidence threshold triggers clarification |
+| **Adapts** | Auto-reschedules if provider cancels; suggests slot alternatives if conflict; falls back gracefully on any API failure |
