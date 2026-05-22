@@ -1,0 +1,244 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Nastaliq+Urdu:wght@400;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+
+/* ─── Root Variables ─── */
+:root {
+  --background: #0A0F1E;
+  --foreground: #ffffff;
+  --primary: #00D4FF;
+  --secondary: #00FF88;
+  --accent: #7B2FFF;
+  --warning: #FFB800;
+  --danger: #FF3B5C;
+}
+
+/* ─── Base ─── */
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  background-image:
+    radial-gradient(ellipse at 20% 10%, rgba(0, 212, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 90%, rgba(123, 47, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, #0A0F1E 0%, #060a15 100%);
+  background-attachment: fixed;
+  overflow-x: hidden;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #060a15; }
+::-webkit-scrollbar-thumb { background: rgba(0,212,255,0.4); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #00D4FF; }
+
+/* ─── Selection ─── */
+::selection { background: rgba(0,212,255,0.3); color: #fff; }
+
+@layer utilities {
+  /* Glass Cards */
+  .glass {
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .glass-md {
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .glass-dark {
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .glass-panel {
+    @apply glass rounded-2xl shadow-card;
+  }
+
+  /* Neon borders */
+  .neon-border-blue {
+    border: 1px solid rgba(0,212,255,0.4);
+    box-shadow: 0 0 20px rgba(0,212,255,0.15), inset 0 0 20px rgba(0,212,255,0.03);
+  }
+  .neon-border-green {
+    border: 1px solid rgba(0,255,136,0.4);
+    box-shadow: 0 0 20px rgba(0,255,136,0.15), inset 0 0 20px rgba(0,255,136,0.03);
+  }
+  .neon-border-purple {
+    border: 1px solid rgba(123,47,255,0.4);
+    box-shadow: 0 0 20px rgba(123,47,255,0.15);
+  }
+
+  /* Gradient text */
+  .text-gradient {
+    background: linear-gradient(135deg, #00D4FF 0%, #7B2FFF 50%, #00FF88 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-gradient-blue {
+    background: linear-gradient(135deg, #00D4FF, #00FF88);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-gradient-gold {
+    background: linear-gradient(135deg, #FFB800, #FF6B9D);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Shimmer animation for gradient text */
+  .animate-shimmer {
+    background-size: 200% auto;
+    animation: shimmer 2.5s linear infinite;
+  }
+
+  /* Glow text */
+  .text-glow-blue { text-shadow: 0 0 20px rgba(0,212,255,0.8), 0 0 40px rgba(0,212,255,0.4); }
+  .text-glow-green { text-shadow: 0 0 20px rgba(0,255,136,0.8), 0 0 40px rgba(0,255,136,0.4); }
+
+  /* Urdu text */
+  .urdu { font-family: 'Noto Nastaliq Urdu', serif; direction: rtl; text-align: right; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* Stat card */
+  .stat-card {
+    @apply glass-panel p-6 flex flex-col items-center text-center gap-2;
+  }
+
+  /* Service category colors */
+  .cat-ac { --cat-color: #00D4FF; }
+  .cat-electrician { --cat-color: #FFB800; }
+  .cat-plumber { --cat-color: #3B82F6; }
+  .cat-tutor { --cat-color: #7B2FFF; }
+  .cat-beautician { --cat-color: #FF6B9D; }
+  .cat-carpenter { --cat-color: #D97706; }
+
+  /* Card hover 3D tilt effect */
+  .card-3d {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+  .card-3d:hover {
+    transform: perspective(1000px) rotateX(-3deg) rotateY(3deg) translateZ(10px);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.5), 0 0 30px rgba(0,212,255,0.1);
+  }
+
+  /* Pulsing dot */
+  .pulse-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+
+  /* Progress ring */
+  .progress-ring { transform: rotate(-90deg); }
+
+  /* Tag pill */
+  .tag {
+    @apply px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  /* Trust badges */
+  .trust-high {
+    @apply tag bg-secondary/20 text-secondary border border-secondary/30;
+  }
+  .trust-medium {
+    @apply tag bg-warning/20 text-warning border border-warning/30;
+  }
+  .trust-low {
+    @apply tag bg-danger/20 text-danger border border-danger/30;
+  }
+
+  /* Button styles */
+  .btn-primary {
+    @apply px-6 py-3 bg-primary text-background font-bold rounded-full
+           hover:bg-white transition-all duration-300 hover:scale-105
+           shadow-neon-blue hover:shadow-neon-green;
+  }
+  .btn-outline {
+    @apply px-6 py-3 border border-primary/50 text-primary font-semibold rounded-full
+           hover:bg-primary/10 transition-all duration-300;
+  }
+  .btn-ghost {
+    @apply px-4 py-2 text-white/60 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-200;
+  }
+}
+
+/* ─── Animations ─── */
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 15px rgba(0,212,255,0.3); }
+  50% { box-shadow: 0 0 40px rgba(0,212,255,0.7), 0 0 80px rgba(0,212,255,0.3); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-15px) rotate(1deg); }
+  66% { transform: translateY(-8px) rotate(-1deg); }
+}
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes orbit {
+  from { transform: rotate(0deg) translateX(130px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(130px) rotate(-360deg); }
+}
+@keyframes particleFloat {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  50% { opacity: 0.6; }
+  100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
+}
+
+/* ─── Map container ─── */
+.map-container { width: 100%; height: 100%; min-height: 300px; }
+.map-container > div { border-radius: inherit; }
+
+/* ─── Print receipt styles ─── */
+@media print {
+  body { background: white; color: black; }
+  .no-print { display: none; }
+}
+
+/* ─── Custom input range for sliders ─── */
+input[type="range"] {
+  -webkit-appearance: none;
+  background: rgba(255,255,255,0.1);
+  height: 4px; border-radius: 2px;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #00D4FF;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0,212,255,0.5);
+}
+
+/* ─── Framer Motion page transitions ─── */
+.page-enter { opacity: 0; transform: translateY(20px); }
+.page-enter-active { opacity: 1; transform: translateY(0); transition: all 0.4s ease; }
